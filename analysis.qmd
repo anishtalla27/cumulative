@@ -6,28 +6,73 @@ execute:
   echo: false
 ---
 
-
 ```{r}
 #| label: setup
 #| message: false
 
 library(tidyverse)
 library(primer.data)
+library(tidymodels)
+library(gtsummary)
+library(equatiomatic)
+library(marginaleffects)
 ```
 
+
 ```{r}
-ces |> 
+# Prepare data
+x <- ces |> 
   filter(year == 2020) |>
   select(approval, education, faminc, ideology) |>
   drop_na() |>
   slice_sample(n = 2000)
 ```
 
+
 ```{r}
-x |>
-  ggplot(aes(x = ideology, fill = approval)) +
-  geom_bar() +
-  labs()
+#| label: model
+#| cache: true
+
+fit_approval <- MASS::polr(approval ~ ideology + faminc + education, data = x)
 ```
 
-Using the CES, which is one of the largest political surveys in the United States, we seek to make a predictive model which could help us see a relationship between approval of the president and an individual’s political ideology.
+
+```{r}
+#| label: plot
+
+temp <- plot_predictions(fit_approval, 
+                        condition = c("ideology"),
+                        draw = FALSE)
+
+ggplot(temp, aes(x = ideology, y = estimate, fill = group)) +
+  geom_bar(stat = "identity") +
+  scale_fill_brewer(palette = "RdBu") +
+  geom_text(aes(label = sprintf("%.2f", estimate)),
+            position = position_stack(vjust = 0.5), size = 3) +
+  coord_flip() +
+  labs(title = "Predicted Approval by Ideology",
+       x = "Ideology",
+       y = "Estimated Probability",
+       fill = "Approval Level") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+With CES data, we’re studying how presidential approval relates to ideology in 2020, but we have to consider that survey participants might not fully represent all Americans. Our cumulative ordinal regression model suggests that people who are very conservative are about 5.6 units higher in presidential approval than those who are very liberal, with a 95% confidence interval from 4.9 to 6.2.
+
+
+```{r}
+#| label: math
+
+extract_eq(fit_approval, 
+           intercept = "beta", 
+           use_coefs = TRUE)
+```
+
+
+```{r}
+#| label: table
+
+tbl_regression(fit_approval)
+```
