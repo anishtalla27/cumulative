@@ -59,6 +59,8 @@ ggplot(temp, aes(x = ideology, y = estimate, fill = group)) +
 
 ```
 
+Using the CES, which is one of the largest political surveys in the United States, we seek to make a predictive model which could help us see a relationship between approval of the president and an individual’s political ideology.
+
 With CES data, we’re studying how presidential approval relates to ideology in 2020, but we have to consider that survey participants might not fully represent all Americans. Our cumulative ordinal regression model suggests that people who are very conservative are about 5.6 units higher in presidential approval than those who are very liberal, with a 95% confidence interval from 4.9 to 6.2.
 
 
