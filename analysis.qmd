@@ -2,5 +2,32 @@
 title: "Cumulative"
 format: html
 author: Anish Talla
+execute: 
+  echo: false
 ---
 
+
+```{r}
+#| label: setup
+#| message: false
+
+library(tidyverse)
+library(primer.data)
+```
+
+```{r}
+ces |> 
+  filter(year == 2020) |>
+  select(approval, education, faminc, ideology) |>
+  drop_na() |>
+  slice_sample(n = 2000)
+```
+
+```{r}
+x |>
+  ggplot(aes(x = ideology, fill = approval)) +
+  geom_bar() +
+  labs()
+```
+
+Using the CES, which is one of the largest political surveys in the United States, we seek to make a predictive model which could help us see a relationship between approval of the president and an individual’s political ideology.
